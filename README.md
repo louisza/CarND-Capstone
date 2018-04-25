@@ -1,9 +1,9 @@
 ###  Team Members
-- Romain Li     - romain_li@163.com
-- Raul Serrano  - raulserrano223@gmail.com
-- Jack Qian     - qianyeqiang@sjtu.edu.cn
-- Ferit Uzer    - ferituzer@gmail.com
-- Louis Pienaar - lpienaar@gmail.com
+- Romain Li     - romain_li at 163 dot com
+- Raul Serrano  - raulserrano223 at gmail dot com
+- Jack Qian     - qianyeqiang at sjtu dot edu dot cn
+- Ferit Uzer    - ferituzer at gmail dot com
+- Louis Pienaar - lpienaar at gmail dot com
 
 Data Training repository: https://github.com/romain-li/CarND-Traffic-Light-Classifier-Project
 

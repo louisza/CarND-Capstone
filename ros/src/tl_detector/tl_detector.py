@@ -4,6 +4,7 @@ import rospy
 import tf
 import yaml
 from cv_bridge import CvBridge
+import cv2
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from light_classification.tl_classifier import TLClassifier
 from scipy.spatial import KDTree
@@ -153,12 +154,19 @@ class TLDetector(object):
 
         """
 
-        return light.state
-        #if (not self.has_image):
-        #    self.prev_light_loc = None
-        #    return False
 
-        #cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        if (not self.has_image):
+            self.prev_light_loc = None
+            return False
+
+        need_convert = True
+        if hasattr(self.camera_image, 'encoding'):
+            if self.camera_image.encoding == 'rgb8':
+                need_convert = False
+
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        if need_convert:
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
 
         # Generate sample images
         # import time
@@ -168,7 +176,10 @@ class TLDetector(object):
         # rospy.logerr('Sample image saved: %s', filename)
 
         # Get classification
-        #return self.light_classifier.get_classification(cv_image)
+        tf_class =  self.light_classifier.get_classification(cv_image)
+        rospy.debug("predcited class %s" % tf_class)
+
+        return light.state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its

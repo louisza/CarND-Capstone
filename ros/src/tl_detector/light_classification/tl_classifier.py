@@ -11,12 +11,6 @@ class TLClassifier(object):
         # TODO load classifier
         model_path = rospy.get_param("/traffic_light_model")
         self.path_to_graph = r'models/rcnn/frozen_inference_graph.pb'
-        PATH_TO_LABELS = r'data/udacity_label_map.pbtxt'
-        NUM_CLASSES = 4
-        label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-        categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES,
-                                                                    use_display_name=True)
-        category_index = label_map_util.create_category_index(categories)
         self.graph = self.load_graph(self.path_to_graph)
         self.sess = tf.Session()
 
@@ -39,6 +33,19 @@ class TLClassifier(object):
                 tf.import_graph_def(od_graph_def, name='')
         return graph
 
+    def filter_boxes(self, min_score, boxes, scores, classes):
+        """Return boxes with a confidence >= `min_score`"""
+        n = len(classes)
+        idxs = []
+        for i in range(n):
+            if scores[i] >= min_score:
+                idxs.append(i)
+
+        filtered_boxes = boxes[idxs, ...]
+        filtered_scores = scores[idxs, ...]
+        filtered_classes = classes[idxs, ...]
+        return filtered_boxes, filtered_scores, filtered_classes
+
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
 
@@ -50,13 +57,37 @@ class TLClassifier(object):
 
         """
         # TODO implement light color prediction
+        # Load a sample image.
+        image_np = np.expand_dims(np.asarray(image), 0)
+        result = TrafficLight.UNKNOWN
 
+        # Actual detection.
+        (boxes, scores, classes) = self.sess.run([self.detect_boxes, self.detect_scores, self.detect_classes],
+                                                 feed_dict={self.image_tensor: image_np})
 
+        # Remove unnecessary dimensions
+        boxes = np.squeeze(boxes)
+        scores = np.squeeze(scores)
+        classes = np.squeeze(classes)
 
+        confidence_cutoff = 0.8
+        # Filter boxes with a confidence score less than `confidence_cutoff`
+        boxes, scores, classes = self.filter_boxes(confidence_cutoff, boxes, scores, classes)
 
-        return {
-            0: TrafficLight.GREEN,
-            1: TrafficLight.RED,
-            2: TrafficLight.UNKNOWN,
-            3: TrafficLight.YELLOW,
-        }.get(self.predict(image), TrafficLight.UNKNOWN)
+        i = 0
+        result_str = 'unknown'
+        score = 0
+        if boxes.shape[i] > 0:
+            if classes[i] == 1:  # 'Green':
+                result = TrafficLight.GREEN
+                result_str = 'Green'
+            elif classes[i] == 2:  # 'Red':
+                result = TrafficLight.RED
+                result_str = 'Red'
+            elif classes[i] == 3:  # 'Yellow':
+                result = TrafficLight.YELLOW
+                result_str = 'Yellow'
+
+        rospy.debug('classification result {}, score {:.3f}'.format(result_str, score))
+
+        return result
