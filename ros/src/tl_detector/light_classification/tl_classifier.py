@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import rospy
 import tensorflow as tf
-from utils import label_map_util
+#from utils import label_map_util
 from styx_msgs.msg import TrafficLight
 
 
@@ -88,6 +88,6 @@ class TLClassifier(object):
                 result = TrafficLight.YELLOW
                 result_str = 'Yellow'
 
-        rospy.debug('classification result {}, score {:.3f}'.format(result_str, score))
+        rospy.logdebug('classification result {}, score {:.3f}'.format(result_str, score))
 
         return result
