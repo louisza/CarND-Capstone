@@ -93,6 +93,7 @@ class TLDetector(object):
         """
         self.has_image = True
         self.camera_image = msg
+        rospy.loginfo("Image received")
         light_wp, state = self.process_traffic_lights()
 
         '''
@@ -153,7 +154,7 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-
+        rospy.loginfo("Starting get light state")
 
         if (not self.has_image):
             self.prev_light_loc = None
@@ -177,7 +178,7 @@ class TLDetector(object):
 
         # Get classification
         tf_class =  self.light_classifier.get_classification(cv_image)
-        rospy.logdebug("predicted class %s" % tf_class)
+        rospy.loginfo("predicted class %s" % tf_class)
 
         return light.state
 

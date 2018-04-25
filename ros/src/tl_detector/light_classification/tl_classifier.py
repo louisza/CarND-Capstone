@@ -88,6 +88,6 @@ class TLClassifier(object):
                 result = TrafficLight.YELLOW
                 result_str = 'Yellow'
 
-        rospy.logdebug('classification result {}, score {:.3f}'.format(result_str, score))
+        rospy.loginfo('classification result {}, score {:.3f}'.format(result_str, score))
 
         return result
