@@ -178,7 +178,8 @@ class TLDetector(object):
 
         # Get classification
         tf_class =  self.light_classifier.get_classification(cv_image)
-        rospy.loginfo("predicted class %s" % tf_class)
+        rospy.loginfo("predicted class %s : light state %s " % (tf_class,light.state)
+
 
         return light.state
 
